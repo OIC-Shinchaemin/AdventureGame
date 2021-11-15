@@ -2,11 +2,14 @@
 #include	"Save.h"
 
 //現在のシーン(外部参照、実体はGameApp.cpp)
-extern int						gScene;
+extern int						gCurrentScene;
 //変更するシーン(外部参照、実体はGameApp.cpp)
-extern int						gChangeScene;
+extern int						gNextScene;
 //変更フラグ(外部参照、実体はGameApp.cpp)
-extern bool						gbChange;
+extern bool						gbSceneChanged;
+
+CRectangle						gReturnRect(ReturnRect);
+
 
 /**
  * コンストラクタ
@@ -66,8 +69,8 @@ void CSave::UpdateAlpha(void){
 		if(m_Alpha - ALPHA_SPEED <= 0)
 		{
 			m_Alpha = 0;
-			gScene = gChangeScene;
-			gbChange = false;
+			gCurrentScene = gNextScene;
+			gbSceneChanged = false;
 		}
 		else
 		{
@@ -96,7 +99,7 @@ void CSave::Update(void){
 	UpdateAlpha();
 	
 	//遷移中はこれ以降の処理はしない
-	if(m_bEnd || gScene != gChangeScene)
+	if(m_bEnd || gCurrentScene != gNextScene)
 	{
 		return;
 	}

@@ -16,11 +16,11 @@
 #include	"Save.h"
 
 //現在のシーン
-int						gScene = SCENENO_TITLE;
+int						gCurrentScene = SCENENO_TITLE;
 //変更するシーン
-int						gChangeScene = SCENENO_TITLE;
+int						gNextScene = SCENENO_TITLE;
 //変更フラグ
-bool					gbChange = false;
+bool					gbSceneChanged = false;
 
 //各シーンクラス
 CTitle					gTitleScene;
@@ -60,7 +60,7 @@ MofBool CGameApp::Update(void){
 	g_pInput->RefreshKey();
 
 	//シーン番号によって更新
-	switch(gScene)
+	switch(gCurrentScene)
 	{
 		case SCENENO_TITLE:
 			gTitleScene.Update();
@@ -74,12 +74,12 @@ MofBool CGameApp::Update(void){
 	}
 	
 	//変更中の場合変更先のシーンも更新する
-	if(gScene != gChangeScene)
+	if(gCurrentScene != gNextScene)
 	{
 		//変更先シーンの初期化
-		if(!gbChange)
+		if(!gbSceneChanged)
 		{
-			switch(gChangeScene)
+			switch(gNextScene)
 			{
 				case SCENENO_TITLE:
 					gTitleScene.Initialize();
@@ -91,10 +91,10 @@ MofBool CGameApp::Update(void){
 					gSaveScene.Initialize();
 					break;
 			}
-			gbChange = true;
+			gbSceneChanged = true;
 		}
 
-		switch(gChangeScene)
+		switch(gNextScene)
 		{
 			case SCENENO_TITLE:
 				gTitleScene.Update();
@@ -129,7 +129,7 @@ MofBool CGameApp::Render(void){
 	g_pGraphics->ClearTarget(0.0f,0.0f,0.0f,0.0f,1.0f,0);
 	
 	//シーン番号によって描画
-	switch(gScene)
+	switch(gCurrentScene)
 	{
 		case SCENENO_TITLE:
 			gTitleScene.Render();
@@ -141,9 +141,9 @@ MofBool CGameApp::Render(void){
 			gSaveScene.Render();
 			break;
 	}
-	if(gScene != gChangeScene)
+	if(gCurrentScene != gNextScene)
 	{
-		switch(gChangeScene)
+		switch(gNextScene)
 		{
 			case SCENENO_TITLE:
 				gTitleScene.Render();
@@ -161,7 +161,7 @@ MofBool CGameApp::Render(void){
 	if(g_bDebug)
 	{
 		//シーン番号によって描画
-		switch(gScene)
+		switch(gCurrentScene)
 		{
 			case SCENENO_TITLE:
 				gTitleScene.RenderDebug();

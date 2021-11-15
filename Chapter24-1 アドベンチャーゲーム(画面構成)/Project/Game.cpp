@@ -3,11 +3,11 @@
 #include	"Save.h"
 
 //現在のシーン(外部参照、実体はGameApp.cpp)
-extern int						gScene;
+extern int						gCurrentScene;
 //変更するシーン(外部参照、実体はGameApp.cpp)
-extern int						gChangeScene;
+extern int						gNextScene;
 //変更フラグ(外部参照、実体はGameApp.cpp)
-extern bool						gbChange;
+extern bool						gbSceneChanged;
 //セーブシーン(画部参照、実体はGameApp.cpp)
 extern CSave					gSaveScene;
 
@@ -56,8 +56,8 @@ void CGame::UpdateAlpha(void){
 		if(m_Alpha - ALPHA_SPEED <= 0)
 		{
 			m_Alpha = 0;
-			gScene = gChangeScene;
-			gbChange = false;
+			gCurrentScene = gNextScene;
+			gbSceneChanged = false;
 		}
 		else
 		{
@@ -86,7 +86,7 @@ void CGame::Update(void){
 	UpdateAlpha();
 
 	//遷移中はこれ以降の処理はしない
-	if(m_bEnd || gScene != gChangeScene)
+	if(m_bEnd || gCurrentScene != gNextScene)
 	{
 		return;
 	}
@@ -95,13 +95,13 @@ void CGame::Update(void){
 	if(g_pInput->IsKeyPush(MOFKEY_F2))
 	{
 		m_bEnd = true;
-		gChangeScene = SCENENO_TITLE;
+		gNextScene = SCENENO_TITLE;
 	}
 	//F3キーで保存画面へ
 	else if(g_pInput->IsKeyPush(MOFKEY_F3))
 	{
 		m_bEnd = true;
-		gChangeScene = SCENENO_SAVE;
+		gNextScene = SCENENO_SAVE;
 		gSaveScene.SetState(SCENENO_GAME,true);
 	}
 }

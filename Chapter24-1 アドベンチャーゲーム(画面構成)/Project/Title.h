@@ -6,7 +6,9 @@ private:
 	CTexture				m_StartImage;
 	CTexture				m_LoadImage;
 	BYTE					m_Alpha;
-	bool					m_bEnd;
+	bool					m_bEndScene;
+	Vector2					m_MousePosition;
+
 public:
 	CTitle();
 	~CTitle();
@@ -17,4 +19,7 @@ public:
 	void Render(void);
 	void RenderDebug(void);
 	void Release(void);
+
+	void UpdateMousePosition();
+	void UpdateButton();
 };

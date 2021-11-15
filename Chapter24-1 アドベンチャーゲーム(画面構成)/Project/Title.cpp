@@ -1,15 +1,16 @@
 #include	"GameDefine.h"
 #include	"Title.h"
 #include	"Save.h"
+#include	<string>
 
-//現在のシーン(外部参照、実体はGameApp.cpp)
-extern int						gScene;
-//変更するシーン(外部参照、実体はGameApp.cpp)
-extern int						gChangeScene;
-//変更フラグ(外部参照、実体はGameApp.cpp)
-extern bool						gbChange;
-//セーブシーン(画部参照、実体はGameApp.cpp)
+extern int						gCurrentScene;
+extern int						gNextScene;
+// シーンの変更チェックフラグ
+extern bool						gbSceneChanged;
 extern CSave					gSaveScene;
+
+CRectangle						gStartRect(StartRect);
+CRectangle						gLoadRect(LoadRect);
 
 /**
  * コンストラクタ
@@ -20,7 +21,8 @@ m_BackImage() ,
 m_StartImage() ,
 m_LoadImage() ,
 m_Alpha(0) ,
-m_bEnd(false) {
+m_MousePosition(0,0),
+m_bEndScene(false) {
 }
 
 /**
@@ -38,6 +40,8 @@ bool CTitle::Load(void){
 	//テクスチャの読み込み
 	if(!m_BackImage.Load("Title.png"))
 	{
+		// TODO: Debug文字表示？
+		// MOF_PRINTLOG("イメージがロードできませんでした。%s", str);
 		return false;
 	}
 	if(!m_StartImage.Load("Start.png"))
@@ -57,7 +61,7 @@ bool CTitle::Load(void){
  * 状態を初期化したいときに実行する。
  */
 void CTitle::Initialize(void){
-	m_bEnd = false;
+	m_bEndScene = false;
 	m_Alpha = 0;
 }
 
@@ -67,13 +71,13 @@ void CTitle::Initialize(void){
  */
 void CTitle::UpdateAlpha(void){
 	//終了状態ならフェードアウト
-	if(m_bEnd)
+	if(m_bEndScene)
 	{
 		if(m_Alpha - ALPHA_SPEED <= 0)
 		{
 			m_Alpha = 0;
-			gScene = gChangeScene;
-			gbChange = false;
+			gCurrentScene = gNextScene;
+			gbSceneChanged = false;
 		}
 		else
 		{
@@ -102,12 +106,14 @@ void CTitle::Update(void){
 	UpdateAlpha();
 	
 	//遷移中はこれ以降の処理はしない
-	if(m_bEnd || gScene != gChangeScene)
+	if(m_bEndScene || gCurrentScene != gNextScene)
 	{
 		return;
 	}
 
-	//マウスクリックで遷移判定
+	UpdateMousePosition();
+
+	UpdateButton();
 }
 
 /**
@@ -116,6 +122,11 @@ void CTitle::Update(void){
  */
 void CTitle::Render(void){
 	m_BackImage.Render(0,0,MOF_ARGB(m_Alpha,255,255,255));
+
+	if (gStartRect.CollisionPoint(m_MousePosition)) {
+		// TODO : Delete Magic Number
+		m_StartImage.Render(384, 472, MOF_COLOR_WHITE);
+	}
 }
 
 /**
@@ -133,4 +144,24 @@ void CTitle::Release(void){
 	m_BackImage.Release();
 	m_StartImage.Release();
 	m_LoadImage.Release();
+}
+
+void CTitle::UpdateMousePosition() {
+	g_pInput->GetMousePos(m_MousePosition);
+}
+
+void CTitle::UpdateButton() {
+
+	if (!g_pInput->IsMouseKeyPush(MOFMOUSE_LBUTTON)) return;
+
+	// Start Button
+	if (gStartRect.CollisionPoint(m_MousePosition)) {
+		m_bEndScene = true;
+		gNextScene = SCENENO_GAME;
+	}
+	else if (gLoadRect.CollisionPoint(m_MousePosition)) {
+		m_bEndScene = true;
+		gNextScene = SCENENO_SAVE;
+		gSaveScene.SetState(SCENENO_TITLE, false);
+	}
 }
