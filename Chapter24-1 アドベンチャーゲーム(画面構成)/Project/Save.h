@@ -5,9 +5,10 @@ private:
 	CTexture				m_BackImage;
 	CTexture				m_ReturnImage;
 	BYTE					m_Alpha;
-	bool					m_bEnd;
+	bool					m_bEndScene;
 	bool					m_bSave;
 	int						m_PrevScene;
+	Vector2					m_MousePosition;
 public:
 	CSave();
 	~CSave();
@@ -19,4 +20,7 @@ public:
 	void RenderDebug(void);
 	void Release(void);
 	void SetState(int ps,bool s){ m_PrevScene = ps; m_bSave = s; }
+
+	void UpdateMousePosition();
+	void UpdateButton();
 };
