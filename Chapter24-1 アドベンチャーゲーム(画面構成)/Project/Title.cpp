@@ -16,10 +16,7 @@ extern CSave					gSaveScene;
 CRectangle						gStartRect(StartRect);
 CRectangle						gLoadRect(LoadRect);
 
-/**
- * コンストラクタ
- *
- */
+/*********************** コンストラクタ & ディストラクタ***********************/
 CTitle::CTitle() :
 m_BackImage() ,
 m_StartImage() ,
@@ -29,17 +26,11 @@ m_MousePosition(0,0),
 m_bEndScene(false) {
 }
 
-/**
- * デストラクタ
- *
- */
 CTitle::~CTitle(){
 }
+/*********************** End of コンストラクタ & ディストラクタ***********************/
 
-/**
- * 読み込み
- * 利用するテクスチャを読み込む。
- */
+/*********************** 初期化 ***********************/
 bool CTitle::Load(void){
 	//テクスチャの読み込み
 	char* str = "Title.png";
@@ -73,12 +64,26 @@ void CTitle::Initialize(void){
 	m_bEndScene = false;
 	m_Alpha = 0;
 }
+/*********************** ここまで初期化 ***********************/
 
-/**
- * アルファ値の更新
- *
- */
-void CTitle::UpdateAlpha(void){
+/*********************** アップデート ***********************/
+void CTitle::Update(void) 
+{
+	//アルファ値の更新
+	UpdateAlpha();
+
+	//遷移中はこれ以降の処理はしない
+	if (m_bEndScene || gCurrentScene != gNextScene)
+	{
+		return;
+	}
+
+	UpdateMousePosition();
+	UpdateButton();
+}
+
+void CTitle::UpdateAlpha(void)
+{
 	//終了状態ならフェードアウト
 	if(m_bEndScene)
 	{
@@ -106,61 +111,13 @@ void CTitle::UpdateAlpha(void){
 	}
 }
 
-/**
- * 更新
- *
- */
-void CTitle::Update(void){
-	//アルファ値の更新
-	UpdateAlpha();
-	
-	//遷移中はこれ以降の処理はしない
-	if(m_bEndScene || gCurrentScene != gNextScene)
-	{
-		return;
-	}
-
-	UpdateMousePosition();
-
-	UpdateButton();
-}
-
-/**
- * 描画
- *
- */
-void CTitle::Render(void){
-	m_BackImage.Render(0,0,MOF_ARGB(m_Alpha,255,255,255));
-
-	if (gStartRect.CollisionPoint(m_MousePosition)) {
-		m_StartImage.Render(StartButtonPos.x, StartButtonPos.y, MOF_COLOR_WHITE);
-	}else if (gLoadRect.CollisionPoint(m_MousePosition)) {
-		m_LoadImage.Render(LoadButtonPos.x, LoadButtonPos.y, MOF_COLOR_WHITE);
-	}
-}
-
-/**
- * デバッグ描画
- *
- */
-void CTitle::RenderDebug(void){
-}
-
-/**
- * 解放
- *
- */
-void CTitle::Release(void){
-	m_BackImage.Release();
-	m_StartImage.Release();
-	m_LoadImage.Release();
-}
-
-void CTitle::UpdateMousePosition() {
+void CTitle::UpdateMousePosition() 
+{
 	g_pInput->GetMousePos(m_MousePosition);
 }
 
-void CTitle::UpdateButton() {
+void CTitle::UpdateButton() 
+{
 
 	if (!g_pInput->IsMouseKeyPush(MOFMOUSE_LBUTTON)) return;
 
@@ -175,3 +132,36 @@ void CTitle::UpdateButton() {
 		gSaveScene.SetState(SCENENO_TITLE, false);
 	}
 }
+/*********************** ここまでアップデート ***********************/
+
+/*********************** 描画 ***********************/
+void CTitle::Render(void)
+{
+	m_BackImage.Render(0,0,MOF_ARGB(m_Alpha,255,255,255));
+
+	if (gStartRect.CollisionPoint(m_MousePosition)) {
+		m_StartImage.Render(StartButtonPos.x, StartButtonPos.y, MOF_COLOR_WHITE);
+	}else if (gLoadRect.CollisionPoint(m_MousePosition)) {
+		m_LoadImage.Render(LoadButtonPos.x, LoadButtonPos.y, MOF_COLOR_WHITE);
+	}
+}
+
+/**
+ * デバッグ描画
+ *
+ */
+void CTitle::RenderDebug(void)
+{
+}
+/*********************** ここまで描画 ***********************/
+
+/*********************** 解放 ***********************/
+void CTitle::Release(void)
+{
+	m_BackImage.Release();
+	m_StartImage.Release();
+	m_LoadImage.Release();
+}
+/*********************** ここまで解放 ***********************/
+
+/*********************** その他 ***********************/
