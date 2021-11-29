@@ -31,6 +31,7 @@ public:
 	void StepCommand();
 	void TextCommand();
 	bool JumpCommand(const char* label);
+	void SelectCommand();
 
 	void SpriteCommand(SPRITECOMMAND* pSpritCommand);
 	void SetPosCommand(SETPOSCOMMAND* pSetPosCommand);

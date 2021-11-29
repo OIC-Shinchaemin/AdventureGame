@@ -145,6 +145,9 @@ void CGame::Update(void){
 		case CMD_TEXT:
 			TextCommand();
 			break;
+		case CMD_SELECT:
+			SelectCommand();
+			break;
 		}
 	}
 	//クリックで次のコマンドから実行を再開
@@ -210,6 +213,14 @@ void CGame::StepCommand(void) {
 			strcpy(name, pCmd->Name);
 			LoadScript(name);
 			return;
+		}
+		case CMD_SELECT:
+		{
+			SELECTCOMMAND* pCmd = (SELECTCOMMAND*)m_pNowCommand;
+			pCmd->Select.Show(g_pGraphics->GetTargetWidth() * 0.5f,
+				g_pGraphics->GetTargetHeight() * 0.5f);
+			m_bWait = true;
+			break;
 		}
 		default: //定義されていないコマンド
 			break;
@@ -319,7 +330,22 @@ bool CGame::JumpCommand(const char* label)
 	}
 	return false;
 }
+// TODO: バグ直さないと　→　1が選択できない
+void CGame::SelectCommand()
+{
+	SELECTCOMMAND* pSelCommand = (SELECTCOMMAND*)m_pNowCommand;
 
+	if (!pSelCommand->Select.IsShow()) return;
+
+	pSelCommand->Select.Update();
+
+	if (!pSelCommand->Select.IsEnter()) return;
+
+	pSelCommand->Select.Hide();
+	m_bWait = false;
+	JumpCommand(pSelCommand->pLabel[pSelCommand->Select.GetSelect()]);
+	StepCommand();
+}
 
 /**
  * 描画
@@ -332,6 +358,11 @@ void CGame::Render(void){
 	for (int i = 0; i < m_SpriteList.GetArrayCount(); i++)
 	{
 		m_SpriteList[i]->Render();
+	}
+	if (m_pNowCommand->Type == CMD_SELECT)
+	{
+		SELECTCOMMAND* pSelCommand = (SELECTCOMMAND*)m_pNowCommand;
+		pSelCommand->Select.Render();
 	}
 	//表示テキストの下に枠を表示する
 	m_TextWindow.Render(16, 568);

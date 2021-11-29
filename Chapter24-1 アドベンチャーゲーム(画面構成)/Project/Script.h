@@ -1,6 +1,7 @@
 #pragma once
 
 #include	"Mof.h"
+#include	"Menu.h"
 
 //コマンドの定義
 enum tag_SCRIPTCOMMAND {
@@ -11,6 +12,7 @@ enum tag_SCRIPTCOMMAND {
 	CMD_LABEL,
 	CMD_JUMP,
 	CMD_NEXT,
+	CMD_SELECT,
 
 	CMD_COUNT,
 };
@@ -19,7 +21,7 @@ enum tag_SCRIPTCOMMAND {
 //タイプのみを持ち、継承先の各構造体でコマンドごとのパラメーターを追加する
 typedef struct tag_COMMAND {
 	int					Type;
-
+	virtual ~tag_COMMAND() {}
 }COMMAND;
 //テキスト表示コマンドのための構造体
 #define		TEXTBUFFERSIZE			256
@@ -97,7 +99,33 @@ typedef struct tag_NAMECOMMAND : public COMMAND {
 
 }NAMECOMMAND;
 
+typedef struct tag_SELECTCOMMAND : public COMMAND {
+	char				Name[256];
+	int					Count;
+	char**				pItem;
+	char**				pLabel;
 
+	CMenu				Select;
+
+	tag_SELECTCOMMAND() :
+		Select() {
+		Type = CMD_SELECT;
+		memset(Name, 0, 256);
+		Count = 0;
+		pItem = nullptr;
+		pLabel = nullptr;
+	}
+
+	virtual ~tag_SELECTCOMMAND() {
+		for (int i = 0; i < Count; i++) {
+			free(pItem[i]);
+			free(pLabel[i]);
+		}
+		free(pItem);
+		free(pLabel);
+		Select.Release();
+	}
+}SELECTCOMMAND;
 
 class CScript {
 private:
@@ -114,6 +142,7 @@ public:
 	void SetShowCommand(void);
 	void SetPosCommand(void);
 	void NameCommand(int sCmd);
+	void SelectCommand(void);
 	bool LoadTextFile(const char* name);
 	void Release(void);
 	CDynamicArray< COMMAND* >& GetCommand(void){ return m_CommandList; }

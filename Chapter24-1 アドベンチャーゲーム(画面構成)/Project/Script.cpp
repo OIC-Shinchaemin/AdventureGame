@@ -9,6 +9,7 @@ const char* gScriptCommand[] = {
 	"label",
 	"jump",
 	"next",
+	"select",
 
 	"",
 };
@@ -127,6 +128,10 @@ void CScript::ParseCommand(int sCmd){
 		case CMD_JUMP:
 		case CMD_NEXT:
 			NameCommand(sCmd);
+			break;
+		case CMD_SELECT:
+			SelectCommand();
+			break;
 		default:					//定義されていないコマンド
 			break;
 	}
@@ -206,6 +211,35 @@ void CScript::NameCommand(int sCmd) {
 	strcpy(pCmd->Name, Trim(pstr));
 	m_CommandList.Add((COMMAND**)&pCmd);
 }
+
+void CScript::SelectCommand()
+{
+	SELECTCOMMAND* pCmd = new SELECTCOMMAND();
+	char *pstr = strtok(NULL, ",");
+	strcpy(pCmd->Name, Trim(pstr));
+	pstr = strtok(NULL, ",");
+	pCmd->Count = atoi(pstr);
+	pCmd->pItem = (char**)malloc(sizeof(char*) * pCmd->Count);
+	pCmd->pLabel = (char**)malloc(sizeof(char*) * pCmd->Count);
+
+	m_CommandList.Add((COMMAND**)&pCmd);
+	for (int i = 0; i < pCmd->Count; i++) {
+		pstr = strtok(NULL, ",");
+		pstr = Trim(pstr);
+
+		pCmd->pItem[i] = (char*)malloc(strlen(pstr) + 1);		
+		strcpy(pCmd->pItem[i], pstr);
+
+		pstr = strtok(NULL, ((i == pCmd->Count - 1) ? ";" : ","));
+		pstr = Trim(pstr);
+
+		pCmd->pLabel[i] = (char*)malloc(strlen(pstr) + 1);
+		strcpy(pCmd->pLabel[i], pstr);
+	}
+	pCmd->Select.Create(pCmd->Name, pCmd->pItem, pCmd->Count);
+	m_CommandList.Add((COMMAND**)&pCmd);
+}
+
 /**
  * 読み込み
  * テキストファイルを読み込む
