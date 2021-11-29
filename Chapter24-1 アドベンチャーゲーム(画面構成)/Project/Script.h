@@ -8,6 +8,9 @@ enum tag_SCRIPTCOMMAND {
 	CMD_SPRITE,
 	CMD_SETPOS,
 	CMD_SETSHOW,
+	CMD_LABEL,
+	CMD_JUMP,
+	CMD_NEXT,
 
 	CMD_COUNT,
 };
@@ -83,6 +86,15 @@ typedef struct tag_SETSHOWCOMMAND : public COMMAND {
 	}
 }SETSHOWCOMMAND;
 
+struct NAMECOMMAND : public COMMAND {
+	char				Name[256];
+	
+	NAMECOMMAND(int cmd) {
+		Type = cmd;
+		memset(Name, 0, 256);
+	}
+};
+
 class CScript {
 private:
 	char							m_FileName[MAX_PATH];
@@ -97,6 +109,7 @@ public:
 	void SpriteCommand(void);
 	void SetShowCommand(void);
 	void SetPosCommand(void);
+	void NameCommand(int sCmd);
 	bool LoadTextFile(const char* name);
 	void Release(void);
 	CDynamicArray< COMMAND* >& GetCommand(void){ return m_CommandList; }

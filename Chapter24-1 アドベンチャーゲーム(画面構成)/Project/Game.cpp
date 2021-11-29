@@ -197,6 +197,20 @@ void CGame::StepCommand(void) {
 		case CMD_SETSHOW: //スプライトの表示設定コマンド
 			SetShowCommand((SETSHOWCOMMAND*)m_pNowCommand);
 			break;
+		case CMD_JUMP:
+		{
+			NAMECOMMAND* pCmd = (NAMECOMMAND*)m_pNowCommand;
+			JumpCommand(pCmd->Name);
+			break;
+		}
+		case CMD_NEXT:
+		{
+			NAMECOMMAND* pCmd = (NAMECOMMAND*)m_pNowCommand;
+			char name[256];
+			strcpy(name, pCmd->Name);
+			LoadScript(name);
+			return;
+		}
 		default: //定義されていないコマンド
 			break;
 		}
@@ -285,6 +299,27 @@ void CGame::SetShowCommand(SETSHOWCOMMAND* pSpriteCommand) {
 	if (!pSprite) { return; }
 	(*pSprite)->m_bShow = pSpriteCommand->bShow;
 }
+
+bool CGame::JumpCommand(const char* label)
+{
+	int cmd = 0;
+	while (cmd < m_Script.GetCommandCount()) {
+		COMMAND* pCommand = m_Script.GetCommand(cmd);
+		if (pCommand->Type == CMD_LABEL)
+		{
+			NAMECOMMAND* pNameCommand = (NAMECOMMAND*)pCommand;
+			if (stricmp(pNameCommand->Name, label) == 0)
+			{
+				m_pNowCommand = pCommand;
+				m_CommandNo = cmd;
+				return true;
+			}
+		}
+		cmd++;
+	}
+	return false;
+}
+
 
 /**
  * 描画

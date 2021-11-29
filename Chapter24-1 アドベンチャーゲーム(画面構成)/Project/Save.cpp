@@ -148,5 +148,3 @@ void CSave::Release(void)
 #pragma region ユーティリティ
 
 #pragma endregion
-
-

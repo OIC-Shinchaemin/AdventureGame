@@ -15,7 +15,7 @@ private:
 	int							m_CommandNo;
 	COMMAND*					m_pNowCommand;
 	bool						m_bWait;
-
+	
 public:
 	CGame();
 	~CGame();
@@ -30,8 +30,10 @@ public:
 	bool LoadScript(const char* name);
 	void StepCommand();
 	void TextCommand();
+	bool JumpCommand(const char* label);
 
 	void SpriteCommand(SPRITECOMMAND* pSpritCommand);
 	void SetPosCommand(SETPOSCOMMAND* pSetPosCommand);
 	void SetShowCommand(SETSHOWCOMMAND* pSetShowCommand);
+	
 };

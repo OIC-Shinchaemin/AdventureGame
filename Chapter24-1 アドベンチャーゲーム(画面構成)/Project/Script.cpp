@@ -6,7 +6,10 @@ const char* gScriptCommand[] = {
 	"sprite",
 	"setpos",
 	"setshow",
-	
+	"label",
+	"jump",
+	"next",
+
 	"",
 };
 
@@ -120,6 +123,10 @@ void CScript::ParseCommand(int sCmd){
 		case CMD_SETSHOW:			//スプライトの表示設定コマンド
 			SetShowCommand();
 			break;
+		case CMD_LABEL:
+		case CMD_JUMP:
+		case CMD_NEXT:
+			NameCommand(sCmd);
 		default:					//定義されていないコマンド
 			break;
 	}
@@ -193,6 +200,12 @@ void CScript::SetShowCommand(void){
 	m_CommandList.Add((COMMAND**)&pCmd);
 }
 
+void CScript::NameCommand(int sCmd) {
+	NAMECOMMAND* pCmd = new NAMECOMMAND(sCmd);
+	char* pstr = strtok(NULL, ";");
+	strcpy(pCmd->Name, Trim(pstr));
+	m_CommandList.Add((COMMAND**)&pCmd);
+}
 /**
  * 読み込み
  * テキストファイルを読み込む
