@@ -19,6 +19,7 @@ enum tag_SCRIPTCOMMAND {
 //タイプのみを持ち、継承先の各構造体でコマンドごとのパラメーターを追加する
 typedef struct tag_COMMAND {
 	int					Type;
+
 }COMMAND;
 //テキスト表示コマンドのための構造体
 #define		TEXTBUFFERSIZE			256
@@ -86,14 +87,17 @@ typedef struct tag_SETSHOWCOMMAND : public COMMAND {
 	}
 }SETSHOWCOMMAND;
 
-struct NAMECOMMAND : public COMMAND {
+typedef struct tag_NAMECOMMAND : public COMMAND {
 	char				Name[256];
 	
-	NAMECOMMAND(int cmd) {
+	tag_NAMECOMMAND(int cmd) {
 		Type = cmd;
 		memset(Name, 0, 256);
 	}
-};
+
+}NAMECOMMAND;
+
+
 
 class CScript {
 private:
